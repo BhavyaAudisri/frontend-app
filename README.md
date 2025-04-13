@@ -33,4 +33,5 @@ docker push sinha352/frontend-app:latest
   - install jenkins
   - configure ec2 server key inside jenkins credentails
   - configure dockerhub credentails inside jenkins credentails
+  - install docker on jenkins to build the image
   ```
