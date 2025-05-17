@@ -3,19 +3,19 @@ pipeline {
     
     environment {
         DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
-        AWS_EC2_INSTANCE_IP = '54.174.227.8'
+        AWS_EC2_INSTANCE_IP = '184.73.117.186'
         AWS_SSH_KEY = credentials('https-key')
-        DOCKER_IMAGE = 'sinha352/frontend-app'
+        DOCKER_IMAGE = 'bhavyasomisetti/frontend-app'
         IMAGE_VERSION = "${env.BUILD_NUMBER}"
         DOCKER_REGISTRY = 'https://index.docker.io/v1/'
         HOST_PORT = '8000'
-        SSH_USER = 'ubuntu'  // Added this missing variable
+        SSH_USER = 'ec2-user'  // Added this missing variable
     }
     
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/vijay2181/frontend-app.git'
+                git branch: 'main', url: 'https://github.com/BhavyaAudisri/frontend-app.git'
             }
         }
         
@@ -24,7 +24,7 @@ pipeline {
                 script {
                     sh """
                     docker build -t ${DOCKER_IMAGE}:${IMAGE_VERSION} .
-                    docker login -u sinha352 -p 2019
+                    docker login -u bhavyasomisetti -p Aaudisri9@
                     docker push ${DOCKER_IMAGE}:${IMAGE_VERSION}
                     """
                 }
