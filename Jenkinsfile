@@ -2,7 +2,11 @@ pipeline {
     agent {
             label 'agent'
     }
-    
+    options {
+        timeout(time: 30, unit: 'MINUTES')
+        disableConcurrentBuilds()
+        ansiColor('xterm')
+    }
     environment {
         DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
         AWS_EC2_INSTANCE_IP = '184.73.117.186'
