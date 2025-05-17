@@ -39,25 +39,23 @@ pipeline {
             }
         }
 
-       
-         stage('Deploy to EC2') {
+        stage('Deploy to EC2') {
             steps {
-                withAWS(region:'us-east-1', credentials :'AWS-CREDS') {
-                    script {
+                script {
+                    withCredentials([sshUserPrivateKey(
+                        credentialsId: 'https-key',
+                        keyFileVariable: 'SSH_KEY',
+                        usernameVariable: 'SSH_USER'
+                    )]) {
                         sh """
-                        ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ec2-user@${AWS_EC2_INSTANCE_IP} << EOF
+                        ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ${SSH_USER}@${AWS_EC2_INSTANCE_IP} '
                             docker stop sample-frontend || true
                             docker rm sample-frontend || true
                             docker pull ${DOCKER_IMAGE}:${IMAGE_VERSION}
-                            docker run -d \\
-                                --name sample-frontend \\
-                                --restart unless-stopped \\
-                                -p ${HOST_PORT}:80 \\
-                                -e IMAGE_VERSION=${IMAGE_VERSION} \\
-                                ${DOCKER_IMAGE}:${IMAGE_VERSION}
-                        EOF
+                            docker run -d --name sample-frontend --restart unless-stopped -p ${HOST_PORT}:80 -e IMAGE_VERSION=${IMAGE_VERSION} ${DOCKER_IMAGE}:${IMAGE_VERSION}
+                        '
                         """
-                    }
+                        }
                 }
             }
         }
