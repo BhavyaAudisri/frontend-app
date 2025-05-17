@@ -21,43 +21,37 @@ pipeline {
             }
         }
         
-        stage('Build Docker Image') {
+         stage('Build & Push Docker Image') {
             steps {
-                script {
-                    sh """
-                    docker build -t ${DOCKER_IMAGE}:${IMAGE_VERSION} .
-                    docker login -u "${DOCKERHUB_CREDENTIALS_USR}" --password-stdin
-                    docker push ${DOCKER_IMAGE}:${IMAGE_VERSION}
-                    """
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASS')]) {
+                    script {
+                        sh """
+                        docker build -t ${DOCKER_IMAGE}:${IMAGE_VERSION} .
+                        echo "${DOCKERHUB_PASS}" | docker login -u "${DOCKERHUB_USER}" --password-stdin
+                        docker push ${DOCKER_IMAGE}:${IMAGE_VERSION}
+                        """
+                    }
                 }
             }
         }
+
        
-        stage('Deploy to EC2') {  // Renamed from 'Verify Deployment'
+         stage('Deploy to EC2') {
             steps {
-                script {
-                    withCredentials([sshUserPrivateKey(
-                        credentialsId: 'https-key',
-                        keyFileVariable: 'SSH_KEY',
-                        usernameVariable: 'SSH_USER'  // This will provide the username
-                    )]) {
+                withCredentials([sshUserPrivateKey(credentialsId: 'https-key', keyFileVariable: 'SSH_KEY')]) {
+                    script {
                         sh """
-                        # Deploy to target server
-                        ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ${SSH_USER}@${AWS_EC2_INSTANCE_IP} '
+                        ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ec2-user@${AWS_EC2_INSTANCE_IP} << EOF
                             docker stop sample-frontend || true
                             docker rm sample-frontend || true
-                        
-                            # Pull the new image
                             docker pull ${DOCKER_IMAGE}:${IMAGE_VERSION}
-                        
-                            # Run the new container
                             docker run -d \\
                                 --name sample-frontend \\
                                 --restart unless-stopped \\
                                 -p ${HOST_PORT}:80 \\
                                 -e IMAGE_VERSION=${IMAGE_VERSION} \\
                                 ${DOCKER_IMAGE}:${IMAGE_VERSION}
-                        '
+                        EOF
                         """
                     }
                 }
