@@ -9,7 +9,7 @@ pipeline {
     }
     environment {
         DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
-        AWS_EC2_INSTANCE_IP = '184.73.117.186'
+        AWS_EC2_INSTANCE_IP = '44.212.15.223'
         AWS_SSH_KEY = credentials('https-key')
         DOCKER_IMAGE = 'bhavyasomisetti/frontend-app'
         IMAGE_VERSION = "${env.BUILD_NUMBER}"
