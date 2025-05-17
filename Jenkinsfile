@@ -41,7 +41,7 @@ pipeline {
                 withAWS(region:'us-east-1', credentials :'AWS-CREDS') {
                     script {
                         sh """
-                        #ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ec2-user@${AWS_EC2_INSTANCE_IP} << EOF
+                        ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ec2-user@${AWS_EC2_INSTANCE_IP} << EOF
                             docker stop sample-frontend || true
                             docker rm sample-frontend || true
                             docker pull ${DOCKER_IMAGE}:${IMAGE_VERSION}
