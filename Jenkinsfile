@@ -1,5 +1,7 @@
 pipeline {
-    agent any
+    agent {
+            label 'agent'
+    }
     
     environment {
         DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
@@ -24,7 +26,7 @@ pipeline {
                 script {
                     sh """
                     docker build -t ${DOCKER_IMAGE}:${IMAGE_VERSION} .
-                    docker login -u bhavyasomisetti -p Aaudisri9@
+                    docker login -u "${DOCKERHUB_CREDENTIALS_USR}" --password-stdin
                     docker push ${DOCKER_IMAGE}:${IMAGE_VERSION}
                     """
                 }
