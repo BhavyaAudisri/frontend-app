@@ -15,7 +15,7 @@ pipeline {
         IMAGE_VERSION = "${env.BUILD_NUMBER}"
         DOCKER_REGISTRY = 'https://index.docker.io/v1/'
         HOST_PORT = '8000'
-        //SSH_USER = 'ec2-user'  // Added this missing variable
+        SSH_USER = 'ec2-user'  // Added this missing variable
     }
     
     stages {
